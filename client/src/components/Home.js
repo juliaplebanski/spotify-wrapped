@@ -21,6 +21,26 @@ const Header = styled.header`
   }
 `;
 
+const Preview = styled.section`
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-gap: 70px;
+  width: 100%;
+  margin-top: 100px;
+  ${media.tablet`
+    display: block;
+    margin-top: 70px;
+  `};
+`;
+
+const Avatar = styled.div`
+  width: 150px;
+  height: 150px;
+  img {
+    border-radius: 100%;
+  }
+`;
+
 const TopArtistsButton = styled.button`
   background-color: transparent;
   color: ${(props) => (props.isActive ? colors.white : colors.lightGrey)};
@@ -82,7 +102,7 @@ const ArtistName = styled.div`
 
 function Home({ code }) {
   const accessToken = useAuth(code);
-  const [data, setData] = useState("");
+  const [profile, setProfile] = useState("");
   const [topArtists, setTopArtists] = useState([]);
 
   const headers = {
@@ -98,9 +118,10 @@ function Home({ code }) {
   useEffect(() => {
     if (!accessToken) return;
     spotifyApi.getMe().then((data) => {
-      setData(data.body.display_name);
+      console.log(data.body);
+      setProfile(data.body);
     });
-  }, [data, accessToken]);
+  }, [accessToken]);
 
   const getTopArtists = async () => {
     const { data } = await axios.get(
@@ -114,34 +135,52 @@ function Home({ code }) {
 
   return (
     <Main>
-      <Header>
-        <h2>Top Artists</h2>
-     
+      <div className="py-10">
+        <h1 className="text-center text-3xl sm:text-4xl lg:text-4xl">
+          <span className="text-gray-500">Hi, </span>
+          <span className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 text-transparent bg-clip-text">
+            {profile.display_name}
+          </span>
+          <span>👋</span>
+        </h1>
+        <div>
+          <Avatar>
+            {profile ? (
+              <img src={profile.images[1].url} alt="avatar" />
+            ) : (
+              <div>hi</div>
+            )}
+          </Avatar>
+        </div>
+      </div>
+      <Preview>
+        <Header>
+          <h2>Top Artists</h2>
           <TopArtistsButton onClick={() => getTopArtists()}>
             <span>Last 4 Weeks</span>
           </TopArtistsButton>
-        
-      </Header>
-      <ArtistsContainer>
-        {topArtists ? (
-          <ul>
-            {topArtists.slice(0, 10).map((artist, i) => (
-              <Artist key={i}>
-                <ArtistArtwork>
-                  {artist.images.length && (
-                    <img src={artist.images[2].url} alt="Artist" />
-                  )}
-                </ArtistArtwork>
-                <ArtistName>
-                  <span>{artist.name}</span>
-                </ArtistName>
-              </Artist>
-            ))}
-          </ul>
-        ) : (
-          <Loader />
-        )}
-      </ArtistsContainer>
+        </Header>
+        <ArtistsContainer>
+          {topArtists ? (
+            <ul>
+              {topArtists.slice(0, 10).map((artist, i) => (
+                <Artist key={i}>
+                  <ArtistArtwork>
+                    {artist.images.length && (
+                      <img src={artist.images[2].url} alt="Artist" />
+                    )}
+                  </ArtistArtwork>
+                  <ArtistName>
+                    <span>{artist.name}</span>
+                  </ArtistName>
+                </Artist>
+              ))}
+            </ul>
+          ) : (
+            <Loader />
+          )}
+        </ArtistsContainer>
+      </Preview>
     </Main>
   );
 }
