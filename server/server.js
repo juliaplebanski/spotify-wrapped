@@ -8,14 +8,11 @@ const SpotifyWebApi = require("spotify-web-api-node");
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
-app.use(
-  express.static(
-    path.join(
-      __dirname,
-      "/Users/juliaplebanski/Desktop/projects/spotify-wrapped/client/build"
-    )
-  )
-);
+
+const pathToClientBuild = process.env.PATH_TO_CLIENT_BUILD;
+
+app.use(express.static(path.join(__dirname, pathToClientBuild)));
+
 
 const PORT = process.env.PORT || 3001;
 
