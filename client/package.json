@@ -1,4 +1,6 @@
 {
+  "proxy": "http://localhost:3001",
+  "homepage": ".",
   "name": "spotify-wrapped",
   "version": "0.1.0",
   "private": true,

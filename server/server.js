@@ -1,12 +1,23 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const bodyParser = require("body-parser");
 const SpotifyWebApi = require("spotify-web-api-node");
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+app.use(
+  express.static(
+    path.join(
+      __dirname,
+      "/Users/juliaplebanski/Desktop/projects/spotify-wrapped/client/build"
+    )
+  )
+);
+
+const PORT = process.env.PORT || 3001;
 
 app.post("/refresh", (req, res) => {
   const refreshToken = req.body.refreshToken;
@@ -52,7 +63,10 @@ app.post("/login", (req, res) => {
     })
     .catch((err) => {
       res.sendStatus(400);
+      console.log(err);
     });
 });
 
-app.listen(3001);
+app.listen(PORT, () => {
+  console.log(`App up at port ${PORT}`);
+});
