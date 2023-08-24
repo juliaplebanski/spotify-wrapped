@@ -3,10 +3,16 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const SpotifyWebApi = require("spotify-web-api-node");
+const schedule = require("node-schedule");
+const sgMail = require("@sendgrid/mail");
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+
+const scheduledEmails = [];
 
 app.post("/refresh", (req, res) => {
   const refreshToken = req.body.refreshToken;
@@ -53,6 +59,42 @@ app.post("/login", (req, res) => {
     .catch((err) => {
       res.sendStatus(400);
     });
+});
+
+app.post("/schedule-email", async (req, res) => {
+  const { email, topArtists } = req.body;
+
+  const currentMonth = new Date().toLocaleString("default", {
+    month: "long",
+  });
+
+  const emailSubject = `Your Top Artists - ${currentMonth}`;
+
+  const emailContent = `Your top artists of the last month: ${topArtists}`;
+
+  const now = new Date();
+  const scheduleDate = new Date(now.getTime() + 1 * 60 * 1000);
+
+  const job = schedule.scheduleJob(scheduleDate, async () => {
+    try {
+      const msg = {
+        to: email,
+        from: process.env.SENDGRID_EMAIL,
+        subject: emailSubject,
+        text: emailContent,
+        // html: '<p>Your HTML content here</p>' // Use HTML for a rich email content
+      };
+      console.log(msg);
+      await sgMail.send(msg);
+      console.log(`Email sent to ${email}`);
+    } catch (error) {
+      console.error("Error sending email:", error);
+    }
+  });
+
+  scheduledEmails.push({ email, job });
+
+  res.json({ message: "Email scheduled successfully." });
 });
 
 app.listen(3001);
