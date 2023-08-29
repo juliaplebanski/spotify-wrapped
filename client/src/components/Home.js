@@ -104,6 +104,8 @@ function Home({ code }) {
   const accessToken = useAuth(code);
   const [profile, setProfile] = useState("");
   const [topArtists, setTopArtists] = useState([]);
+  const [scheduled, setScheduled] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const headers = {
     Authorization: `Bearer ${accessToken}`,
@@ -120,6 +122,7 @@ function Home({ code }) {
     spotifyApi.getMe().then((data) => {
       console.log(data.body);
       setProfile(data.body);
+      setIsLoading(false);
     });
   }, [accessToken]);
 
@@ -131,6 +134,19 @@ function Home({ code }) {
       }
     );
     setTopArtists(data.items);
+  };
+
+  const handleSchedule = async () => {
+    const topArtistNames = topArtists.map((artist) => artist.name).join(", ");
+    try {
+      await axios.post("http://localhost:3001/schedule-email", {
+        email: profile.email,
+        topArtists: topArtistNames,
+      });
+      setScheduled(true);
+    } catch (error) {
+      console.error("Error scheduling email:", error);
+    }
   };
 
   return (
@@ -145,7 +161,9 @@ function Home({ code }) {
         </h1>
         <div>
           <Avatar>
-            {profile ? (
+            {isLoading ? (
+              <Loader />
+            ) : profile && profile.images.length > 0 ? (
               <img src={profile.images[1].url} alt="avatar" />
             ) : (
               <div>hi</div>
@@ -181,6 +199,16 @@ function Home({ code }) {
           )}
         </ArtistsContainer>
       </Preview>
+      <div>
+        <h1>Email Scheduler</h1>
+        <p>Email: {profile?.email}</p>
+        <p>Top Artists: {topArtists.map((artist) => artist.name).join(", ")}</p>
+        {scheduled ? (
+          <p>Email scheduled! You will receive your top artists email soon.</p>
+        ) : (
+          <button onClick={handleSchedule}>Schedule Email</button>
+        )}
+      </div>
     </Main>
   );
 }
