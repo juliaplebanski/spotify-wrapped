@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Loader from "./Loader";
 import useAuth from "../useAuth";
+import defaultImage from "./icons/default-image.jpeg";
 import SpotifyWebApi from "spotify-web-api-node";
 import axios from "axios";
 import styled from "styled-components/macro";
@@ -166,7 +167,7 @@ function Home({ code }) {
             ) : profile && profile.images.length > 0 ? (
               <img src={profile.images[1].url} alt="avatar" />
             ) : (
-              <div>hi</div>
+              <img src={defaultImage} alt="default-avatar" />
             )}
           </Avatar>
         </div>
