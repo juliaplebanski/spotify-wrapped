@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const bodyParser = require("body-parser");
 const SpotifyWebApi = require("spotify-web-api-node");
 const schedule = require("node-schedule");
@@ -11,6 +12,11 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+const pathToClientBuild = process.env.PATH_TO_CLIENT_BUILD;
+
+app.use(express.static(path.join(__dirname, pathToClientBuild)));
+
+const PORT = process.env.PORT || 3001;
 
 const scheduledEmails = [];
 
@@ -97,4 +103,6 @@ app.post("/schedule-email", async (req, res) => {
   res.json({ message: "Email scheduled successfully." });
 });
 
-app.listen(3001);
+app.listen(PORT, () => {
+  console.log(`App up at port ${PORT}`);
+});

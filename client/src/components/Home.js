@@ -105,6 +105,7 @@ function Home({ code }) {
   const [profile, setProfile] = useState("");
   const [topArtists, setTopArtists] = useState([]);
   const [scheduled, setScheduled] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const headers = {
     Authorization: `Bearer ${accessToken}`,
@@ -121,6 +122,7 @@ function Home({ code }) {
     spotifyApi.getMe().then((data) => {
       console.log(data.body);
       setProfile(data.body);
+      setIsLoading(false);
     });
   }, [accessToken]);
 
@@ -159,7 +161,9 @@ function Home({ code }) {
         </h1>
         <div>
           <Avatar>
-            {profile ? (
+            {isLoading ? (
+              <Loader />
+            ) : profile && profile.images.length > 0 ? (
               <img src={profile.images[1].url} alt="avatar" />
             ) : (
               <div>hi</div>
