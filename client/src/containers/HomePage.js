@@ -1,11 +1,12 @@
 import { useState, useEffect, useMemo } from "react";
-import Loader from "./Loader";
-import useAuth from "../useAuth";
-import defaultImage from "./icons/default-image.jpeg";
+import Loader from "../components/Loader";
+import useAuth from "../services/useAuth";
+import defaultImage from "../components/icons/default-image.jpeg";
 import SpotifyWebApi from "spotify-web-api-node";
 import axios from "axios";
 import styled from "styled-components/macro";
 import { mixins, media, Main } from "../styles";
+import { fetchUserProfile, fetchUserTopArtists } from "../services/api";
 
 const spotifyApi = new SpotifyWebApi({
   clientId: process.env.REACT_APP_CLIENT_ID,
@@ -83,17 +84,12 @@ const Item = styled.div`
   transition: all ease 0.4s;
 `;
 
-function Home({ code }) {
+function HomePage({ code }) {
   const accessToken = useAuth(code);
   const [profile, setProfile] = useState("");
   const [topArtists, setTopArtists] = useState([]);
   const [scheduled, setScheduled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-
-  // const headers = {
-  //   Authorization: `Bearer ${accessToken}`,
-  //   "Content-Type": "application/json",
-  // };
 
   const headers = useMemo(() => {
     return {
@@ -108,31 +104,30 @@ function Home({ code }) {
   }, [accessToken]);
 
   useEffect(() => {
-    if (!accessToken) return;
-    spotifyApi.getMe().then((data) => {
-      console.log(data.body);
-      setProfile(data.body);
-      setIsLoading(false);
-    });
+    if (accessToken) {
+      fetchUserProfile(accessToken)
+        .then((data) => {
+          setProfile(data);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching user profile:", error);
+        });
+    }
   }, [accessToken]);
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const { data } = await axios.get(
-          "https://api.spotify.com/v1/me/top/artists?time_range=short_term",
-          {
-            headers,
-          }
-        );
-        setTopArtists(data.items);
-      } catch (error) {
-        console.error("Error fetching data from Spotify API:", error);
-      }
+    if (accessToken) {
+      fetchUserTopArtists(accessToken)
+        .then((data) => {
+          setTopArtists(data.items);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching user profile:", error);
+        });
     }
-
-    fetchData(); // Automatically fetch data when the component mounts
-  }, [headers]);
+  }, [accessToken]);
 
   const handleSchedule = async () => {
     const topArtistNames = topArtists.map((artist) => artist.name).join(", ");
@@ -210,4 +205,4 @@ function Home({ code }) {
   );
 }
 
-export default Home;
+export default HomePage;
