@@ -1,19 +1,28 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Loader from "./Loader";
 import useAuth from "../useAuth";
 import defaultImage from "./icons/default-image.jpeg";
 import SpotifyWebApi from "spotify-web-api-node";
 import axios from "axios";
 import styled from "styled-components/macro";
-import { theme, mixins, media, Main } from "../styles";
-const { colors, fontSizes, spacing } = theme;
+import { mixins, media, Main } from "../styles";
 
 const spotifyApi = new SpotifyWebApi({
   clientId: process.env.REACT_APP_CLIENT_ID,
 });
 
-const Header = styled.header`
-  ${mixins.flexBetween};
+const ProfileHeader = styled.header`
+  ${mixins.flexCenter};
+  ${media.tablet`
+    display: block;
+  `};
+  h2 {
+    margin: 0;
+  }
+`;
+
+const TopArtistsHeader = styled.header`
+  ${mixins.flexLeft};
   ${media.tablet`
     display: block;
   `};
@@ -24,81 +33,54 @@ const Header = styled.header`
 
 const Preview = styled.section`
   display: grid;
-  grid-template-columns: 1fr;
-  grid-gap: 70px;
+  grid-template-columns: 1fr, 1fr, 1fr;
   width: 100%;
-  margin-top: 100px;
   ${media.tablet`
     display: block;
-    margin-top: 70px;
   `};
 `;
 
 const Avatar = styled.div`
-  width: 150px;
-  height: 150px;
+  margin-right: $margin;
+  width: 250px;
+  height: 250px;
   img {
     border-radius: 100%;
   }
-`;
-
-const TopArtistsButton = styled.button`
-  background-color: transparent;
-  color: ${(props) => (props.isActive ? colors.white : colors.lightGrey)};
-  font-size: ${fontSizes.base};
-  font-weight: 500;
-  padding: 10px;
-  ${media.phablet`
-    font-size: ${fontSizes.sm};
-  `};
-  span {
-    padding-bottom: 2px;
-    border-bottom: 1px solid
-      ${(props) => (props.isActive ? colors.white : `transparent`)};
-    line-height: 1.5;
-    white-space: nowrap;
-  }
-`;
-
-const ArtistsContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  grid-gap: 20px;
-  margin-top: 50px;
-  ${media.tablet`
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  `};
-  ${media.phablet`
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  `};
-`;
-
-const Artist = styled.li`
-  display: flex;
-  align-items: center;
-  margin-bottom: ${spacing.md};
-  ${media.tablet`
-    margin-bottom: ${spacing.base};
-  `};
 `;
 
 const ArtistArtwork = styled.div`
-  display: inline-block;
-  position: relative;
-  width: 50px;
-  min-width: 50px;
-  margin-right: ${spacing.base};
-  img {
-    width: 50px;
-    min-width: 50px;
-    height: 50px;
-    margin-right: ${spacing.base};
-    border-radius: 100%;
-  }
+  width: 100%;
+  border-radius: 6px;
+  margin-bottom: 10px;
 `;
 
 const ArtistName = styled.div`
-  flex-grow: 1;
+  color: #ffffff;
+  font-size: 14px;
+  margin-bottom: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const TopArtists = styled.div`
+  padding: 20px 40px;
+`;
+
+const List = styled.div`
+  display: flex;
+  gap: 20px;
+  overflow: hidden;
+`;
+const Item = styled.div`
+  min-width: 140px;
+  width: 160px;
+  padding: 15px;
+  background-color: #181818;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all ease 0.4s;
 `;
 
 function Home({ code }) {
@@ -108,10 +90,17 @@ function Home({ code }) {
   const [scheduled, setScheduled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const headers = {
-    Authorization: `Bearer ${accessToken}`,
-    "Content-Type": "application/json",
-  };
+  // const headers = {
+  //   Authorization: `Bearer ${accessToken}`,
+  //   "Content-Type": "application/json",
+  // };
+
+  const headers = useMemo(() => {
+    return {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    };
+  }, [accessToken]);
 
   useEffect(() => {
     if (!accessToken) return;
@@ -127,15 +116,23 @@ function Home({ code }) {
     });
   }, [accessToken]);
 
-  const getTopArtists = async () => {
-    const { data } = await axios.get(
-      "https://api.spotify.com/v1/me/top/artists?time_range=short_term",
-      {
-        headers,
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const { data } = await axios.get(
+          "https://api.spotify.com/v1/me/top/artists?time_range=short_term",
+          {
+            headers,
+          }
+        );
+        setTopArtists(data.items);
+      } catch (error) {
+        console.error("Error fetching data from Spotify API:", error);
       }
-    );
-    setTopArtists(data.items);
-  };
+    }
+
+    fetchData(); // Automatically fetch data when the component mounts
+  }, [headers]);
 
   const handleSchedule = async () => {
     const topArtistNames = topArtists.map((artist) => artist.name).join(", ");
@@ -153,37 +150,34 @@ function Home({ code }) {
   return (
     <Main>
       <div className="py-10">
+        <ProfileHeader>
+          <div>
+            <Avatar>
+              {isLoading ? (
+                <Loader />
+              ) : profile && profile.images.length > 0 ? (
+                <img src={profile.images[1].url} alt="avatar" />
+              ) : (
+                <img src={defaultImage} alt="default-avatar" />
+              )}
+            </Avatar>
+          </div>
+        </ProfileHeader>
         <h1 className="text-center text-3xl sm:text-4xl lg:text-4xl">
-          <span className="text-gray-500">Hi, </span>
-          <span className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 text-transparent bg-clip-text">
-            {profile.display_name}
-          </span>
-          <span>👋</span>
+          <h1 className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 text-transparent bg-clip-text">
+            Hi {profile.display_name} 👋
+          </h1>
         </h1>
-        <div>
-          <Avatar>
-            {isLoading ? (
-              <Loader />
-            ) : profile && profile.images.length > 0 ? (
-              <img src={profile.images[1].url} alt="avatar" />
-            ) : (
-              <img src={defaultImage} alt="default-avatar" />
-            )}
-          </Avatar>
-        </div>
       </div>
       <Preview>
-        <Header>
-          <h2>Top Artists</h2>
-          <TopArtistsButton onClick={() => getTopArtists()}>
-            <span>Last 4 Weeks</span>
-          </TopArtistsButton>
-        </Header>
-        <ArtistsContainer>
+        <TopArtistsHeader>
+          <h2>Top artists this month</h2>
+        </TopArtistsHeader>
+        <TopArtists>
           {topArtists ? (
-            <ul>
-              {topArtists.slice(0, 10).map((artist, i) => (
-                <Artist key={i}>
+            <List>
+              {topArtists.slice(0, 5).map((artist, i) => (
+                <Item key={i}>
                   <ArtistArtwork>
                     {artist.images.length && (
                       <img src={artist.images[2].url} alt="Artist" />
@@ -192,16 +186,18 @@ function Home({ code }) {
                   <ArtistName>
                     <span>{artist.name}</span>
                   </ArtistName>
-                </Artist>
+                </Item>
               ))}
-            </ul>
+            </List>
           ) : (
             <Loader />
           )}
-        </ArtistsContainer>
+        </TopArtists>
       </Preview>
       <div>
-        <h1>Email Scheduler</h1>
+        <TopArtistsHeader>
+          <h2>Email Scheduler</h2>
+        </TopArtistsHeader>
         <p>Email: {profile?.email}</p>
         <p>Top Artists: {topArtists.map((artist) => artist.name).join(", ")}</p>
         {scheduled ? (
