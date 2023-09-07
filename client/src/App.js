@@ -1,6 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import Login from "./components/Login";
-import Home from "./components/Home";
+import Login from "./containers/LoginPage";
+import Home from "./containers/HomePage";
 import styled from "styled-components/macro";
 import { GlobalStyle } from "./styles"
 
