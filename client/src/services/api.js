@@ -1,11 +1,5 @@
 import axios from "axios";
-import useAuth from "./useAuth";
-import SpotifyWebApi from "spotify-web-api-node";
-import { useState, useEffect, useMemo } from "react";
 
-const spotifyApi = new SpotifyWebApi({
-  clientId: process.env.REACT_APP_CLIENT_ID,
-});
 const SPOTIFY_API_BASE_URL = "https://api.spotify.com/v1";
 
 export async function fetchUserProfile(accessToken) {
