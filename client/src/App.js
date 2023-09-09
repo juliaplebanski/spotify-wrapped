@@ -3,6 +3,10 @@ import Login from "./containers/LoginPage";
 import Home from "./containers/HomePage";
 import styled from "styled-components/macro";
 import { GlobalStyle } from "./styles"
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { fas } from "@fortawesome/free-solid-svg-icons";
+
+library.add(fas);
 
 const AppContainer = styled.div`
   height: 100%;
