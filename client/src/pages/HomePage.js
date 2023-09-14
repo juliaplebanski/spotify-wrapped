@@ -26,26 +26,22 @@ function HomePage({ code }) {
 
   useEffect(() => {
     if (accessToken) {
-      fetchUserProfile(accessToken)
-        .then((data) => {
-          setProfile(data);
-          setIsLoading(false);
-        })
-        .catch((error) => {
-          console.error("Error fetching user profile:", error);
-        });
-    }
-  }, [accessToken]);
+      const apiRequests = [
+        fetchUserProfile(accessToken),
+        fetchUserTopArtists(accessToken),
+      ];
+      Promise.all(apiRequests)
+        .then((results) => {
+          const profile = results[0];
+          const topArtists = results[1].items;
 
-  useEffect(() => {
-    if (accessToken) {
-      fetchUserTopArtists(accessToken)
-        .then((data) => {
-          setTopArtists(data.items);
+          setProfile(profile);
+          setTopArtists(topArtists);
           setIsLoading(false);
         })
         .catch((error) => {
-          console.error("Error fetching user profile:", error);
+          console.error("Error fetching data:", error);
+          setIsLoading(false);
         });
     }
   }, [accessToken]);
