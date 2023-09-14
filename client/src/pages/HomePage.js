@@ -5,7 +5,7 @@ import defaultImage from "../components/icons/default-image.jpeg";
 import SpotifyWebApi from "spotify-web-api-node";
 import axios from "axios";
 import { fetchUserProfile, fetchUserTopArtists } from "../services/api";
-import "./HomePage.css";
+import "../styles/HomePage.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const spotifyApi = new SpotifyWebApi({
@@ -114,7 +114,9 @@ function HomePage({ code }) {
               Email scheduled! You will receive your top artists email soon.
             </p>
           ) : (
-            <button onClick={handleSchedule}>Schedule Email</button>
+            <button className="schedule-email-button" onClick={handleSchedule}>
+              Schedule Email
+            </button>
           )}
         </div>
       </div>

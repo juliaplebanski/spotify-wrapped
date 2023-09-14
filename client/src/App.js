@@ -1,29 +1,21 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import Login from "./containers/LoginPage";
-import Home from "./containers/HomePage";
-import styled from "styled-components/macro";
+import Login from "./pages/LoginPage";
+import Home from "./pages/HomePage";
 import { GlobalStyle } from "./styles"
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 
 library.add(fas);
 
-const AppContainer = styled.div`
-  height: 100%;
-  min-height: 100vh;
-`;
-
 const code = new URLSearchParams(window.location.search).get("code");
 
 function App() {
  return (
-   <AppContainer>
+   <div>
      <GlobalStyle />
-
      {code ? <Home code={code} /> : <Login />}
-   </AppContainer>
+   </div>
  );
 };
-
 
 export default App;

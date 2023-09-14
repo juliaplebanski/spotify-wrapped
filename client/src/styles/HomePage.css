@@ -95,3 +95,17 @@ body {
   white-space: nowrap;
   white-space: normal;
 }
+.schedule-email-button {
+    display: inline-block;
+    background-color: #1DB954;
+    color: black;
+    border-radius: 30px;
+    padding: 17px 35px;
+    margin: 20px 0 70px;
+    min-width: 160px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+}
