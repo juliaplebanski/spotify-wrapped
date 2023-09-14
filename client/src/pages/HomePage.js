@@ -5,14 +5,12 @@ import defaultImage from "../components/icons/default-image.jpeg";
 import SpotifyWebApi from "spotify-web-api-node";
 import axios from "axios";
 import { fetchUserProfile, fetchUserTopArtists } from "../services/api";
-import "./HomePage.css";
+import "../styles/HomePage.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay } from "@fortawesome/free-solid-svg-icons";
 
 const spotifyApi = new SpotifyWebApi({
   clientId: process.env.REACT_APP_CLIENT_ID,
 });
-
 
 function HomePage({ code }) {
   const accessToken = useAuth(code);
@@ -74,8 +72,7 @@ function HomePage({ code }) {
           )}
           <h1 className="display-name">Hi {profile.display_name} 👋</h1>
         </div>
-
-        <div class="top-artists">
+        <div className="top-artists">
           <h2>Top artists this month</h2>
           {topArtists ? (
             <div className="list">
@@ -85,9 +82,16 @@ function HomePage({ code }) {
                     <img src={artist.images[2].url} alt="Artist" />
                   )}
                   <div class="play">
-                    <FontAwesomeIcon icon={faPlay} />
+                    <div class="fa">
+                      <FontAwesomeIcon
+                        icon="fa-solid fa-circle-play"
+                        size="2xl"
+                        style={{ color: "#1DB954" }}
+                      />
+                    </div>
                   </div>
                   <h4>{artist.name}</h4>
+                  <p>{artist.type}</p>
                 </div>
               ))}
             </div>
@@ -95,7 +99,7 @@ function HomePage({ code }) {
             <Loader />
           )}
         </div>
-        <div class="top-artists">
+        <div className="top-artists">
           <h2>Email Scheduler</h2>
           <p>Email: {profile?.email}</p>
           <p>
@@ -106,7 +110,9 @@ function HomePage({ code }) {
               Email scheduled! You will receive your top artists email soon.
             </p>
           ) : (
-            <button onClick={handleSchedule}>Schedule Email</button>
+            <button className="schedule-email-button" onClick={handleSchedule}>
+              Schedule Email
+            </button>
           )}
         </div>
       </div>

@@ -1,0 +1,111 @@
+.main-container {
+  margin-left: 10%;
+  margin-right: 10%;
+}
+body {
+  background-color: #121212;
+  font-family: 'Montserrat', sans-serif;
+}
+.user {
+  display: grid;
+  grid-template-columns: auto 1fr; 
+  align-items: center; 
+  align-items: flex-start;
+  max-width: 1200px; 
+  margin: 0 auto;
+  padding: 20px;
+}
+.user img {
+  width: 200px;
+  height: 200px;
+  margin-top: 5%;
+  border-radius: 100%;
+}
+.display-name {
+  grid-column: 2;
+  align-self: flex-end;
+  text-align: left;
+}
+.top-artists {
+  padding: 20px 40px;
+}
+.top-artists h2 {
+  color: #ffffff;
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+.top-artists .list {
+  display: flex;
+  gap: 12px;
+  overflow: hidden;
+}
+.top-artists .list .item {
+  min-width: 140px;
+  width: 216px;
+  padding: 16px;
+  background-color: #1e1e1e;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all ease 0.4s;
+}
+.top-artists .list .item:hover {
+  background-color: #252525;
+}
+.top-artists .list .item img {
+  width: 100%;
+  border-radius: 50%;
+  margin-bottom: 16px;
+  position: relative;
+}
+.top-artists .list .item .play {
+  position: relative;
+}
+.top-artists .list .item .play .fa {
+    position: absolute;
+    right: 10px;
+    top: -60px;
+    padding: 18px;
+    border-radius: 100%;
+    opacity: 0;
+    transition: all ease 0.4s;
+}
+.top-artists .list .item:hover .play .fa {
+  opacity: 1;
+  transform: translateY(-20px);
+}
+.top-artists .list .item h4 {
+  color: #ffffff;
+  margin-block: 0px;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: var(--font-family,CircularSp,CircularSp-Arab,CircularSp-Hebr,CircularSp-Cyrl,CircularSp-Grek,CircularSp-Deva,var(--fallback-fonts,sans-serif));
+  padding-block-end: 4px;
+}
+.top-artists .list .item p {
+  text-transform: capitalize;
+  box-sizing: border-box;
+  margin-block: 0px;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  font-family: var(--font-family,CircularSp,CircularSp-Arab,CircularSp-Hebr,CircularSp-Cyrl,CircularSp-Grek,CircularSp-Deva,var(--fallback-fonts,sans-serif));
+  color: var(--text-subdued,#6a6a6a);
+  margin-top: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  white-space: normal;
+}
+.schedule-email-button {
+    display: inline-block;
+    background-color: #1DB954;
+    color: black;
+    border-radius: 30px;
+    padding: 17px 35px;
+    margin: 20px 0 70px;
+    min-width: 160px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+}

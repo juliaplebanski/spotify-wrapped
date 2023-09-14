@@ -1,0 +1,23 @@
+.login-page {
+    --green: #1DB954;
+    --black: #000000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 100vh;
+}
+.login-button {
+    display: inline-block;
+    background-color: var(--green);
+    color: var(--black);
+    border-radius: 30px;
+    padding: 17px 35px;
+    margin: 20px 0 70px;
+    min-width: 160px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+}
