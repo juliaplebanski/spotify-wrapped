@@ -115,8 +115,8 @@ app.post("/schedule-email", async (req, res) => {
 });
 
   async function main() {
-  const uri =
-    "mongodb+srv://julplebanski:sVEsnFlQp8xaK5CN@cluster0.z1qvjkh.mongodb.net/?retryWrites=true&w=majority";
+  //const uri =
+  //  "mongodb+srv://julplebanski:sVEsnFlQp8xaK5CN@cluster0.z1qvjkh.mongodb.net/?retryWrites=true&w=majority";
   // create an instance of MongoClient
   const client = new MongoClient(uri);
   // connect to cluster
