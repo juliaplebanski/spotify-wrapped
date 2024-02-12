@@ -60,6 +60,20 @@ function HomePage({ code }) {
     }
   };
 
+  const handleProfile = async () => {
+    const topArtistNames = topArtists.map((artist) => artist.name).join(", ");
+    try {
+      await axios.post("http://localhost:3001/create-profile", {
+        userId: profile.id,
+        display_name: profile.display_name,
+        email: profile.email,
+        topArtists: topArtistNames,
+      });
+    } catch (error) {
+      console.log("Error handling profile data: ", error);
+    }
+  };
+
   return (
     <div className="home-page">
       <div className="main-container">
@@ -71,6 +85,12 @@ function HomePage({ code }) {
           ) : (
             <img src={defaultImage} alt="default-avatar" />
           )}
+          <button
+            className="schedule-email-button"
+            onClick={handleProfile}
+          >
+            Add profile info to database
+          </button>
           <h1 className="display-name">Hi {profile.display_name} 👋</h1>
         </div>
         <div className="top-artists">
