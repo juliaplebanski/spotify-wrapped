@@ -50,6 +50,7 @@ function HomePage({ code }) {
     const topArtistNames = topArtists.map((artist) => artist.name).join(", ");
     try {
       await axios.post("http://localhost:3001/schedule-email", {
+        display_name: profile.display_name,
         email: profile.email,
         topArtists: topArtistNames,
       });

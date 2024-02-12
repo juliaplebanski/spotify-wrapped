@@ -6,6 +6,10 @@ const bodyParser = require("body-parser");
 const SpotifyWebApi = require("spotify-web-api-node");
 const schedule = require("node-schedule");
 const sgMail = require("@sendgrid/mail");
+const dbo = require("./db/connection");
+const { MongoClient } = require("mongodb");
+const mongoose = require("mongoose");
+const Profile = require('./models/profiles');
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -69,7 +73,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/schedule-email", async (req, res) => {
-  const { email, topArtists } = req.body;
+  const { display_name, email, topArtists } = req.body;
 
   const currentMonth = new Date().toLocaleString("default", {
     month: "long",
@@ -77,7 +81,7 @@ app.post("/schedule-email", async (req, res) => {
 
   const emailSubject = `Your Top Artists - ${currentMonth}`;
 
-  const emailContent = `Your top artists of the last month: ${topArtists}`;
+  const emailContent = `Hi ${display_name}! Your top artists of the last month: ${topArtists}`;
 
   const now = new Date();
   const scheduleDate = new Date(now.getTime() + 1 * 60 * 1000);
@@ -101,9 +105,33 @@ app.post("/schedule-email", async (req, res) => {
 
   scheduledEmails.push({ email, job });
 
-  res.json({ message: "Email scheduled successfully." });
+  const profile = new Profile(req.body);
+  try {
+    await profile.save();
+    res.send(profile);
+  } catch (e) {
+    console.log(e);
+  }
 });
 
-app.listen(PORT, () => {
-  console.log(`App up at port ${PORT}`);
-});
+  async function main() {
+  
+  // create an instance of MongoClient
+  const client = new MongoClient(uri);
+  // connect to cluster
+    try {
+    mongoose.connect(uri);
+      await client.connect(); // client.connect returns a promise
+    console.log("Successfully connected to Atlas");
+    app.listen(PORT, () => {
+      console.log(`Node API app is running on port ${PORT}`);
+    });
+  } catch (e) {
+    console.log(e);
+  } finally {
+    // close connection to cluster --> use finally statement
+    await client.close();
+  }
+  }
+
+main().catch(console.error);
