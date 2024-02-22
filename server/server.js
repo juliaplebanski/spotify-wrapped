@@ -21,6 +21,7 @@ const pathToClientBuild = process.env.PATH_TO_CLIENT_BUILD;
 app.use(express.static(path.join(__dirname, pathToClientBuild)));
 
 const PORT = process.env.PORT || 3001;
+const connectionString = process.env.ATLAS_URI || "";
 
 const scheduledEmails = [];
 
@@ -78,11 +79,8 @@ app.post("/schedule-email", async (req, res) => {
   const currentMonth = new Date().toLocaleString("default", {
     month: "long",
   });
-
   const emailSubject = `Your Top Artists - ${currentMonth}`;
-
   const emailContent = `Hi ${display_name}! Your top artists of the last month: ${topArtists}`;
-
   const now = new Date();
   const scheduleDate = new Date(now.getTime() + 1 * 60 * 1000);
 
@@ -104,34 +102,51 @@ app.post("/schedule-email", async (req, res) => {
   });
 
   scheduledEmails.push({ email, job });
-
-  const profile = new Profile(req.body);
-  try {
-    await profile.save();
-    res.send(profile);
-  } catch (e) {
-    console.log(e);
-  }
+  res.json({ message: "Email scheduled successfully." });
 });
 
-  async function main() {
+app.post("/create-profile", async (req, res) => {
+  const profile = new Profile(req.body);
+  console.log("the profile: " + profile);
+  // place this inside of a try catch block
+  let dateToInsert = new Date(Date.now() + 2 * 1000);
+
+  const client = new MongoClient(connectionString);
   
+  const db = client.db("test");
+  const prof = await db.collection("profiles");
+  const query = { userId: profile.userId };
+  const update = {
+    $set: {
+      userId: profile.userId,
+      display_name: profile.display_name,
+      email: profile.email,
+      topArtists: profile.topArtists,
+      date: dateToInsert,
+    },
+  };
+  const options = { upsert: true };
+  prof.updateOne(query, update, options);
+  res.json({ message: "Profile created / updated successfully" });
+});
+
+async function main() {
   // create an instance of MongoClient
-  const client = new MongoClient(uri);
+  const client = new MongoClient(connectionString);
   // connect to cluster
     try {
-    mongoose.connect(uri);
+      mongoose.connect(connectionString);
       await client.connect(); // client.connect returns a promise
-    console.log("Successfully connected to Atlas");
-    app.listen(PORT, () => {
-      console.log(`Node API app is running on port ${PORT}`);
-    });
-  } catch (e) {
-    console.log(e);
-  } finally {
-    // close connection to cluster --> use finally statement
-    await client.close();
-  }
+      console.log("Successfully connected to Atlas");
+      app.listen(PORT, () => {
+        console.log(`Node API app is running on port ${PORT}`);
+      });
+    } catch (e) {
+      console.log(e);
+    } finally {
+      // close connection to cluster --> use finally statement
+      await client.close();
+    }
   }
 
 main().catch(console.error);
