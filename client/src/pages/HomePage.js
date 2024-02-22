@@ -85,14 +85,14 @@ function HomePage({ code }) {
           ) : (
             <img src={defaultImage} alt="default-avatar" />
           )}
-          <button
+          <h1 className="display-name">Hi {profile.display_name} 👋</h1>
+        </div>
+        <button
             className="schedule-email-button"
             onClick={handleProfile}
           >
             Add profile info to database
           </button>
-          <h1 className="display-name">Hi {profile.display_name} 👋</h1>
-        </div>
         <div className="top-artists">
           <h2>Top artists this month</h2>
           {topArtists ? (
